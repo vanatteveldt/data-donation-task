@@ -258,13 +258,33 @@ def extract_rows(item, node: Node, context=None, path_prefix=()):
     return rows
 
 
-def create_entry_df(file_input: list[str], entry: Entry, json_root: str | None = None) -> pd.DataFrame | None:
+def create_entry_df(file_input: list[str], entry: Entry, json_root: str | None = None, reader=None) -> pd.DataFrame | None:
     """Create a dataframe for a single entry."""
-    try:
-        data = read_file(file_input, entry.filename)
-    except FileNotFoundError as e:
-        # logging.warning(f"{entry.table}: Cannot find file {entry.filename} ({e})")
-        return None
+    if reader is not None:
+        filename = entry.filename
+        if filename and "$USERNAME" in filename:
+            pat = re.escape(filename).replace(r"\$USERNAME", r"([^/]+_)?\d{10,}")
+            results = reader.json_all(pat)
+            data = [r.data for r in results if r.found]
+            if not data:
+                return None
+        elif filename and filename.endswith(".js"):
+            result = reader.js(filename)
+            if not result.found:
+                return None
+            data = result.data
+        elif filename:
+            result = reader.json(filename)
+            if not result.found:
+                return None
+            data = result.data
+        else:
+            return None  # no-filename case shouldn't be reached with a reader
+    else:
+        try:
+            data = read_file(file_input, entry.filename)
+        except FileNotFoundError:
+            return None
 
     if json_root:
         data = [d[json_root] for d in data]
@@ -289,8 +309,8 @@ def create_entry_df(file_input: list[str], entry: Entry, json_root: str | None =
     return pd.DataFrame(all_records)
 
 
-def create_table(file_input: list[str], entries: list[Entry], json_root: str | None = None) -> pd.DataFrame:
-    tables = [create_entry_df(file_input, entry, json_root=json_root) for entry in entries]
+def create_table(file_input: list[str], entries: list[Entry], json_root: str | None = None, reader=None) -> pd.DataFrame:
+    tables = [create_entry_df(file_input, entry, json_root=json_root, reader=reader) for entry in entries]
     tables = [t for t in tables if t is not None]
     if not tables:
         return pd.DataFrame()
@@ -330,16 +350,22 @@ def read_csv_from_file_input(file_input: list[str], csv_filename: str) -> pd.Dat
     raise FileNotFoundError(f"{filename} not found in ZIP files: {file_input}")
 
 
-def create_csv_table(file_input: list[str], entries: list[Entry]) -> pd.DataFrame:
+def create_csv_table(file_input: list[str], entries: list[Entry], reader=None) -> pd.DataFrame:
     all_tables = []
 
     for entry in entries:
         assert entry.filename is not None
-        try:
-            df = read_csv_from_file_input(file_input, entry.filename)
-        except FileNotFoundError:
-            logging.warning(f"CSV not found: {entry.filename}")
-            continue
+        if reader is not None:
+            result = reader.csv(entry.filename)
+            if not result.found:
+                continue
+            df = result.data
+        else:
+            try:
+                df = read_csv_from_file_input(file_input, entry.filename)
+            except FileNotFoundError:
+                logging.warning(f"CSV not found: {entry.filename}")
+                continue
         expected_columns = list(entry.tree.columns.keys())
         existing_columns = [col for col in expected_columns if col in df.columns]
         df = df[existing_columns]

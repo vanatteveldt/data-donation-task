@@ -77,12 +77,15 @@ DDP_CATEGORIES = [
 ]
 
 
-def extract_tables(file: str, validation):
+def extract_tables(file: str, validation, errors: Counter[str]):
     from port.helpers.entries_data import IG_ENTRIES
+    from port.helpers.extraction_helpers import ZipArchiveReader
+
+    reader = ZipArchiveReader(file, validation.archive_members, errors)
 
     for key, entries in IG_ENTRIES.items():
         try:
-            df = create_table([file], entries)
+            df = create_table([file], entries, reader=reader)
             if not df.empty:
                 yield d3i_props.PropsUIPromptConsentFormTableViz(
                     id=key,
@@ -91,6 +94,7 @@ def extract_tables(file: str, validation):
                 )
         except Exception as e:
             logger.exception("Error in %s: %s", key, e)
+            errors[key] += 1
 
     placeholder_json = structure_from_zip(file)
     df_placeholder = pd.DataFrame([{"Anonymized data structure": placeholder_json}])
@@ -109,8 +113,9 @@ class InstagramFlow(FlowBuilder):
         return validate.validate_zip(DDP_CATEGORIES, file)
 
     def extract_data(self, file: str, validation) -> ExtractionResult:
-        tables = list(extract_tables(file, validation))
-        return ExtractionResult(tables=tables, errors=Counter())
+        errors: Counter[str] = Counter()
+        tables = list(extract_tables(file, validation, errors))
+        return ExtractionResult(tables=tables, errors=errors)
 
 
 def process(session_id):
