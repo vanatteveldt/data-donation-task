@@ -33,20 +33,20 @@ description of this pattern.
 
 | Commit | What |
 |--------|------|
-| `01f2768` | Instagram: wired to `IG_ENTRIES`, deleted `donation_flows/instagram.py` |
-| `50c832f` | Instagram: removed `donation_table` wrapper, direct `PropsUIPromptConsentFormTableViz` |
-| `4fc2d38` | Facebook: wired to `FB_ENTRIES`, deleted `donation_flows/facebook.py` |
-| `dcf8721` | Facebook: linter formatting |
-| `8d3664c` | X/Twitter: wired to `X_ENTRIES`, deleted `donation_flows/twitter.py` |
-| `472eb65` | TikTok: wired to `TIKTOK_ENTRIES`, deleted `donation_flows/tiktok.py` |
-| `b3a9ea1` | TikTok: added JSON fallback in `validate_file` (TikTok exports as plain JSON or zip) |
-| `a333aa0` | YouTube: wired to `YT_ENTRIES`, deleted `donation_flows/youtube.py` |
-| `5e6a3c8` | Deleted `donation_flows/` directory and `helpers/donation_flow.py` |
-| `ca9cdd9` | Inlined `readers.py` into `parsers.py`, deleted `readers.py` |
-| `a9ae353` | `ZipArchiveReader`: added `js()` method and NFC Unicode normalisation |
-| `ca86c8c` | All zip platforms: pass shared `ZipArchiveReader` to `create_table()` (zip opened once) |
-| `f015428` | Instagram: handle paginated `post_comments_N.json` exports (plan §3.5) |
-| `18313e0` | TikTok: wire `errors` counter through `extract_tables` (was silently dropped) |
+| [`01f2768`](https://github.com/vanatteveldt/data-donation-task/commit/01f2768) | Instagram: wired to `IG_ENTRIES`, deleted `donation_flows/instagram.py` |
+| [`50c832f`](https://github.com/vanatteveldt/data-donation-task/commit/50c832f) | Instagram: removed `donation_table` wrapper, direct `PropsUIPromptConsentFormTableViz` |
+| [`4fc2d38`](https://github.com/vanatteveldt/data-donation-task/commit/4fc2d38) | Facebook: wired to `FB_ENTRIES`, deleted `donation_flows/facebook.py` |
+| [`dcf8721`](https://github.com/vanatteveldt/data-donation-task/commit/dcf8721) | Facebook: linter formatting |
+| [`8d3664c`](https://github.com/vanatteveldt/data-donation-task/commit/8d3664c) | X/Twitter: wired to `X_ENTRIES`, deleted `donation_flows/twitter.py` |
+| [`472eb65`](https://github.com/vanatteveldt/data-donation-task/commit/472eb65) | TikTok: wired to `TIKTOK_ENTRIES`, deleted `donation_flows/tiktok.py` |
+| [`b3a9ea1`](https://github.com/vanatteveldt/data-donation-task/commit/b3a9ea1) | TikTok: added JSON fallback in `validate_file` (TikTok exports as plain JSON or zip) |
+| [`a333aa0`](https://github.com/vanatteveldt/data-donation-task/commit/a333aa0) | YouTube: wired to `YT_ENTRIES`, deleted `donation_flows/youtube.py` |
+| [`5e6a3c8`](https://github.com/vanatteveldt/data-donation-task/commit/5e6a3c8) | Deleted `donation_flows/` directory and `helpers/donation_flow.py` |
+| [`ca9cdd9`](https://github.com/vanatteveldt/data-donation-task/commit/ca9cdd9) | Inlined `readers.py` into `parsers.py`, deleted `readers.py` |
+| [`a9ae353`](https://github.com/vanatteveldt/data-donation-task/commit/a9ae353) | `ZipArchiveReader`: added `js()` method and NFC Unicode normalisation |
+| [`ca86c8c`](https://github.com/vanatteveldt/data-donation-task/commit/ca86c8c) | All zip platforms: pass shared `ZipArchiveReader` to `create_table()` (zip opened once) |
+| [`f015428`](https://github.com/vanatteveldt/data-donation-task/commit/f015428) | Instagram: handle paginated `post_comments_N.json` exports (plan §3.5) |
+| [`18313e0`](https://github.com/vanatteveldt/data-donation-task/commit/18313e0) | TikTok: wire `errors` counter through `extract_tables` (was silently dropped) |
 
 ---
 
