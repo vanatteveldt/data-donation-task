@@ -9,26 +9,17 @@ It handles DDPs in the english language with filetype js.
 
 import logging
 from collections import Counter
-import json
-import io
-import re
-from typing import Any
 
 import pandas as pd
 
-import port.api.props as props
 import port.api.d3i_props as d3i_props
-from port.api.d3i_props import ExtractionResult
-import port.helpers.extraction_helpers as eh
+import port.api.props as props
 import port.helpers.validate as validate
-from port.helpers.extraction_helpers import ZipArchiveReader
+from port.api.d3i_props import ExtractionResult
 from port.helpers.flow_builder import FlowBuilder
-
-from port.helpers.validate import (
-    DDPCategory,
-    DDPFiletype,
-    Language,
-)
+from port.helpers.parsers import create_table
+from port.helpers.Structure_extractor_libraries.X_get_json_structure import structure_from_zip
+from port.helpers.validate import DDPCategory, DDPFiletype, Language
 
 logger = logging.getLogger(__name__)
 
@@ -44,457 +35,28 @@ DDP_CATEGORIES = [
 ]
 
 
-def bytesio_to_listdict(bytes_to_read: io.BytesIO) -> list[dict[Any, Any]]:
-    """
-    Converts a io.BytesIO buffer containing a twitter.js file, to a list of dicts
-
-    A list of dicts is the current structure of twitter.js files
-    """
-
-    out = []
-    lines = []
-
-    try:
-        with io.TextIOWrapper(bytes_to_read, encoding="utf8") as f:
-            lines = f.readlines()
-
-        # change first line so its a valid json
-        lines[0] = re.sub("^.*? = ", "", lines[0])
-
-        # convert to a list of dicts
-        out = json.loads("".join(lines))
-
-    except json.decoder.JSONDecodeError as e:
-        logger.error("The input buffer did not contain a valid JSON: %s", e)
-    except IndexError as e:
-        logger.error("No lines were read, could be empty input buffer: %s", e)
-    except Exception as e:
-        logger.error("Exception was caught: %s", e)
-
-    return out
-
-
-def ad_engagement_to_df(reader: ZipArchiveReader, errors: Counter) -> pd.DataFrame:
-
-    result = reader.raw("ad-engagements.js")
-    if not result.found:
-        return pd.DataFrame()
-    items = bytesio_to_listdict(result.data)
-
-    out = pd.DataFrame()
-    datapoints = []
-
-    try:
-        for item in items:
-            d = eh.dict_denester(item)
-            datapoints.append((
-                eh.find_item(d, "tweetText"),
-                eh.find_item(d, "impressionTime"),
-            ))
-        out = pd.DataFrame(datapoints, columns=["Text", "Impression time"]) # pyright: ignore
-
-    except Exception as e:
-        logger.error("Exception caught: %s", e)
-        errors[type(e).__name__] += 1
-
-    return out
-
-
-def personalization_to_df(reader: ZipArchiveReader, errors: Counter) -> pd.DataFrame:
-
-    result = reader.raw("personalization.js")
-    if not result.found:
-        return pd.DataFrame()
-    items = bytesio_to_listdict(result.data)
-
-    out = pd.DataFrame()
-    datapoints = []
-
-    try:
-        l = items[0]["p13nData"]["interests"]["interests"]
-        for item in l:
-            d = eh.dict_denester(item)
-            datapoints.append((
-                eh.find_item(d, "name"),
-                eh.find_item(d, "isDisabled"),
-            ))
-        out = pd.DataFrame(datapoints, columns=["Interest", "is disabled"]) # pyright: ignore
-
-    except Exception as e:
-        logger.error("Exception caught: %s", e)
-        errors[type(e).__name__] += 1
-
-    return out
-
-
-def follower_to_df(reader: ZipArchiveReader, errors: Counter) -> pd.DataFrame:
-    """
-    following.js
-    """
-
-    datapoints = []
-    out = pd.DataFrame()
-
-    result = reader.raw("follower.js")
-    if not result.found:
-        return pd.DataFrame()
-    ld = bytesio_to_listdict(result.data)
-
-    try:
-        for item in ld:
-            datapoints.append((
-                item.get("follower", {}).get("userLink", None)
-            ))
-        out = pd.DataFrame(datapoints, columns=["Link to user"]) # pyright: ignore
-    except Exception as e:
-        logger.error("Exception caught: %s", e)
-        errors[type(e).__name__] += 1
-
-    return out
-
-
-def following_to_df(reader: ZipArchiveReader, errors: Counter) -> pd.DataFrame:
-    """
-    following.js
-    """
-
-    datapoints = []
-    out = pd.DataFrame()
-
-    result = reader.raw("following.js")
-    if not result.found:
-        return pd.DataFrame()
-    ld = bytesio_to_listdict(result.data)
-
-    try:
-        for item in ld:
-            datapoints.append((
-                item.get("following", {}).get("userLink", None)
-            ))
-        out = pd.DataFrame(datapoints, columns=["Link to user"]) # pyright: ignore
-    except Exception as e:
-        logger.error("Exception caught: %s", e)
-        errors[type(e).__name__] += 1
-
-    return out
-
-
-
-def like_to_df(reader: ZipArchiveReader, errors: Counter) -> pd.DataFrame:
-    """
-    like.js
-    """
-
-    datapoints = []
-    out = pd.DataFrame()
-
-    result = reader.raw("like.js")
-    if not result.found:
-        return pd.DataFrame()
-    ld = bytesio_to_listdict(result.data)
-
-    try:
-        for item in ld:
-            datapoints.append((
-                item.get("like", {}).get("tweetId", None),
-                item.get("like", {}).get("fullText", None)
-            ))
-        out = pd.DataFrame(datapoints, columns=["Tweet Id", "Tweet"]) #pyright: ignore
-        out["Tweet Id"] = "https://twitter.com/a/status/" + out["Tweet Id"]
-    except Exception as e:
-        logger.error("Exception caught: %s", e)
-        errors[type(e).__name__] += 1
-
-    return out
-
-
-def tweets_to_df(reader: ZipArchiveReader, errors: Counter) -> pd.DataFrame:
-    """
-    tweets.js
-    """
-
-    datapoints = []
-    out = pd.DataFrame()
-
-    result = reader.raw("tweets.js")
-    if not result.found:
-        return pd.DataFrame()
-    ld = bytesio_to_listdict(result.data)
-
-    try:
-        for item in ld:
-            datapoints.append((
-                item.get("tweet", {}).get("created_at", None),
-                item.get("tweet", {}).get("full_text", None),
-                str(item.get("tweet", {}).get("retweeted", ""))
-            ))
-        out = pd.DataFrame(datapoints, columns=["Date", "Tweet", "Retweeted"]) #pyright: ignore
-    except Exception as e:
-        logger.error("Exception caught: %s", e)
-        errors[type(e).__name__] += 1
-
-    return out
-
-
-def block_to_df(reader: ZipArchiveReader, errors: Counter) -> pd.DataFrame:
-    """
-    block.js
-    """
-
-    result = reader.raw("block.js")
-    if not result.found:
-        return pd.DataFrame()
-    ld = bytesio_to_listdict(result.data)
-
-    datapoints = []
-    out = pd.DataFrame()
-
-    try:
-        for item in ld:
-            datapoints.append((
-                item.get("blocking", {}).get("userLink", "")
-            ))
-        out = pd.DataFrame(datapoints, columns=["Blocked users"]) # pyright: ignore
-
-    except Exception as e:
-        logger.error("Exception caught: %s", e)
-        errors[type(e).__name__] += 1
-
-    return out
-
-
-def mute_to_df(reader: ZipArchiveReader, errors: Counter) -> pd.DataFrame:
-    """
-    mute.js
-    """
-
-    datapoints = []
-    out = pd.DataFrame()
-
-    result = reader.raw("mute.js")
-    if not result.found:
-        return pd.DataFrame()
-    ld = bytesio_to_listdict(result.data)
-
-    try:
-        for item in ld:
-            datapoints.append((
-                item.get("muting", {}).get("userLink", "")
-            ))
-        out = pd.DataFrame(datapoints, columns=["Muted users"]) # pyright: ignore
-    except Exception as e:
-        logger.error("Exception caught: %s", e)
-        errors[type(e).__name__] += 1
-
-    return out
-
-
-def tweet_headers_to_df(reader: ZipArchiveReader, errors: Counter) -> pd.DataFrame:
-    datapoints = []
-    out = pd.DataFrame()
-
-    result = reader.raw("tweet-headers.js")
-    if not result.found:
-        return pd.DataFrame()
-    ld = bytesio_to_listdict(result.data)
-
-    try:
-        for item in ld:
-            d = eh.dict_denester(item)
-            datapoints.append((
-                eh.find_item(d, "tweet_id"),
-                eh.find_item(d, "user_id"),
-                eh.find_item(d, "created_at"),
-            ))
-
-        out = pd.DataFrame(datapoints, columns=["Tweet id", "User id", "Created at"]) # pyright: ignore
-    except Exception as e:
-        logger.error("Exception caught: %s", e)
-        errors[type(e).__name__] += 1
-
-    return out
-
-
-def user_link_clicks_to_df(reader: ZipArchiveReader, errors: Counter) -> pd.DataFrame:
-    datapoints = []
-    out = pd.DataFrame()
-
-    result = reader.raw("user-link-clicks.js")
-    if not result.found:
-        return pd.DataFrame()
-    ld = bytesio_to_listdict(result.data)
-
-    try:
-        for item in ld:
-            d = eh.dict_denester(item)
-            datapoints.append((
-                eh.find_item(d, "tweetId"),
-                eh.find_item(d, "finalUrl"),
-                eh.find_item(d, "timeStampOfInteraction"),
-            ))
-
-        out = pd.DataFrame(datapoints, columns=["Tweet id", "Link", "Datum en tijd"]) # pyright: ignore
-    except Exception as e:
-        logger.error("Exception caught: %s", e)
-        errors[type(e).__name__] += 1
-
-    return out
-
-
-
-def extraction(reader: ZipArchiveReader) -> ExtractionResult:
-    errors = reader.errors
-    tables = [
-        d3i_props.PropsUIPromptConsentFormTableViz(
-            id="x_ad_engagement",
-            data_frame=ad_engagement_to_df(reader, errors),
-            title=props.Translatable({
-                "en": "Your engagement with ads",
-                "nl": "Ad engagement"
-            }),
-            description=props.Translatable({
-                "en": "Shows data about your interactions with advertisements on the platform",
-                "nl": "Toont gegevens over uw interacties met advertenties op het platform"
-            })
-        ),
-        d3i_props.PropsUIPromptConsentFormTableViz(
-            id="x_follower",
-            data_frame=follower_to_df(reader, errors),
-            title=props.Translatable({
-                "en": "Your followers",
-                "nl": "Follower"
-            }),
-            description=props.Translatable({
-                "en": "List of accounts that follow your profile",
-                "nl": "Lijst van accounts die jouw profiel volgen"
-            })
-        ),
-        d3i_props.PropsUIPromptConsentFormTableViz(
-            id="x_following",
-            data_frame=following_to_df(reader, errors),
-            title=props.Translatable({
-                "en": "Accounts you follow",
-                "nl": "Following"
-            }),
-            description=props.Translatable({
-                "en": "List of accounts that you are following",
-                "nl": "Lijst van accounts die je volgt"
-            })
-        ),
-        d3i_props.PropsUIPromptConsentFormTableViz(
-            id="x_block",
-            data_frame=block_to_df(reader, errors),
-            title=props.Translatable({
-                "en": "Accounts you blocked",
-                "nl": "Block"
-            }),
-            description=props.Translatable({
-                "en": "List of accounts you have blocked",
-                "nl": "Lijst van accounts die je hebt geblokkeerd"
-            })
-        ),
-        d3i_props.PropsUIPromptConsentFormTableViz(
-            id="x_like",
-            data_frame=like_to_df(reader, errors),
-            title=props.Translatable({
-                "en": "Posts that you liked",
-                "nl": "Like"
-            }),
-            description=props.Translatable({
-                "en": "Posts that you've marked as liked",
-                "nl": "Berichten die je hebt geliked"
-            }),
-            visualizations=[
-                {
-                    "title": {
-                        "en": "Words in Tweets you liked, larger words mean they occur more often",
-                        "nl": "Words in Tweets you liked, larger words mean they occur more often"
-                    },
-                    "type": "wordcloud",
-                    "textColumn": "Tweet",
-                    "tokenize": True,
-                }
-            ]
-        ),
-        d3i_props.PropsUIPromptConsentFormTableViz(
-            id="x_tweet",
-            data_frame=tweets_to_df(reader, errors),
-            title=props.Translatable({
-                "en": "Your tweets",
-                "nl": "Jouw Tweets"
-            }),
-            description=props.Translatable({
-                "en": "Posts you have created on the platform",
-                "nl": "Berichten die je hebt geplaatst op het platform"
-            }),
-            visualizations=[
-                {
-                    "title": {
-                        "en": "Words in your Tweets, larger words mean they occur more often in your Tweets",
-                        "nl": "Words in your Tweets, larger words mean they occur more often in your Tweets"
-                    },
-                    "type": "wordcloud",
-                    "textColumn": "Tweet",
-                    "tokenize": True,
-                }
-            ]
-        ),
-        d3i_props.PropsUIPromptConsentFormTableViz(
-            id="x_personalization",
-            data_frame=personalization_to_df(reader, errors),
-            title=props.Translatable({
-                "en": "Your personalization",
-                "nl": "Personalization"
-            }),
-            description=props.Translatable({
-                "en": "Information about your personalization settings and preferences",
-                "nl": "Informatie over uw personalisatie-instellingen en voorkeuren"
-            })
-        ),
-        d3i_props.PropsUIPromptConsentFormTableViz(
-            id="x_mute",
-            data_frame=mute_to_df(reader, errors),
-            title=props.Translatable({
-                "en": "Accounts you muted",
-                "nl": "Mute"
-            }),
-            description=props.Translatable({
-                "en": "List of accounts you have muted",
-                "nl": "Lijst van accounts die je hebt gedempt"
-            })
-        ),
-        d3i_props.PropsUIPromptConsentFormTableViz(
-            id="x_tweet_headers",
-            data_frame=tweet_headers_to_df(reader, errors),
-            title=props.Translatable({
-                "en": "Tweet headers",
-                "nl": "Tweet headers"
-            }),
-            description=props.Translatable({
-                "en": "Metadata information about your tweets",
-                "nl": "Metadata-informatie over uw tweets"
-            })
-        ),
-        d3i_props.PropsUIPromptConsentFormTableViz(
-            id="x_user_link_clicks",
-            data_frame=user_link_clicks_to_df(reader, errors),
-            title=props.Translatable({
-                "en": "Links you clicked",
-                "nl": "User link clicks"
-            }),
-            description=props.Translatable({
-                "en": "Record of links you've clicked on while using the platform",
-                "nl": "Overzicht van links waarop je hebt geklikt tijdens het gebruik van het platform"
-            })
-        )
-    ]
-
-    # Filter out tables with empty dataframes
-    return ExtractionResult(
-        tables=[table for table in tables if not table.data_frame.empty],
-        errors=errors,
+def extract_tables(file: str, validation):
+    from port.helpers.entries_data import X_ENTRIES
+
+    for key, entries in X_ENTRIES.items():
+        try:
+            df = create_table([file], entries)
+            if not df.empty:
+                yield d3i_props.PropsUIPromptConsentFormTableViz(
+                    id=key,
+                    data_frame=df,
+                    title=props.Translatable({"en": key, "nl": key, "es": key}),
+                )
+        except Exception as e:
+            logger.exception("Error in %s: %s", key, e)
+
+    placeholder_json = structure_from_zip(file)
+    df_placeholder = pd.DataFrame([{"Anonymized data structure": placeholder_json}])
+    yield d3i_props.PropsUIPromptConsentFormTableViz(
+        id="placeholder",
+        data_frame=df_placeholder,
+        title=props.Translatable({"en": "Data structure", "es": "Estructura de datos", "nl": "Gegevensstructuur"}),
     )
-
 
 
 class XFlow(FlowBuilder):
@@ -504,10 +66,9 @@ class XFlow(FlowBuilder):
     def validate_file(self, file):
         return validate.validate_zip(DDP_CATEGORIES, file)
         
-    def extract_data(self, file_value, validation):
-        errors = Counter()
-        reader = ZipArchiveReader(file_value, validation.archive_members, errors)
-        return extraction(reader)
+    def extract_data(self, file: str, validation) -> ExtractionResult:
+        tables = list(extract_tables(file, validation))
+        return ExtractionResult(tables=tables, errors=Counter())
 
 
 def process(session_id):
