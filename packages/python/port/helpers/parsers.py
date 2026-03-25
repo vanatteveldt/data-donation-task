@@ -1,3 +1,5 @@
+import fnmatch
+import io
 import itertools
 import json
 import logging
@@ -8,7 +10,6 @@ import zipfile
 from typing import Annotated, Any, Iterable, NamedTuple, TypeAlias
 
 import pandas as pd
-from port.helpers.readers import read_csv, read_js, read_json
 
 JsonPath: TypeAlias = Annotated[tuple[str, ...], "A tuple correspondiong to a json path to find values"]
 JsonKey: TypeAlias = str
@@ -93,6 +94,70 @@ def get_list(d: dict, *keys):
     """Return the value at the given keys if it's a list, else []."""
     val = get_in(d, *keys)
     return val if isinstance(val, list) else []
+
+
+def _match_filename(file_paths: list[str], lookup: list[str]):
+    for file_path in file_paths:
+        for lookup_str in lookup:
+            if fnmatch.fnmatch(file_path, lookup_str):
+                return file_path
+    return None
+
+
+def _find_file_in_zip(zip_filepath: str, file_paths: list[str]):
+    with zipfile.ZipFile(zip_filepath, "r") as zip_ref:
+        match = _match_filename(zip_ref.namelist(), file_paths)
+        if match is None:
+            return None
+        with zip_ref.open(match) as file:
+            return file.read()
+
+
+def _read_binary(file_input: list[str], file_paths: list[str]):
+    match = _match_filename(file_input, file_paths)
+    if match is not None:
+        with open(match, "rb") as file:
+            return file.read()
+    for filename in file_input:
+        if filename.split(".")[-1] == "zip":
+            file_content = _find_file_in_zip(filename, file_paths)
+            if file_content is not None:
+                return file_content
+    raise FileNotFoundError("No file found with paths: " + str(file_paths))
+
+
+def _read_text(file_input: list[str], file_paths: list[str], encoding: str = "utf-8") -> str:
+    bin = _read_binary(file_input, file_paths)
+    try:
+        return bin.decode(encoding)
+    except Exception:
+        raise ValueError("Could not decode binary file to text with encoding: " + encoding)
+
+
+def read_json(file_input: list[str], file_paths: list[str]):
+    return json.loads(_read_text(file_input, file_paths))
+
+
+def read_js(file_input: list[str], target_files: list[str]) -> list[dict]:
+    extracted_data = []
+    for zip_path in file_input:
+        with zipfile.ZipFile(zip_path, "r") as z:
+            for target_file in target_files:
+                js_files = [f for f in z.namelist() if target_file in f]
+                if js_files:
+                    with z.open(js_files[0]) as raw_file:
+                        with io.TextIOWrapper(raw_file, encoding="utf8") as text_file:
+                            lines = text_file.readlines()
+                        lines[0] = re.sub(r"^.*? = ", "", lines[0])
+                        try:
+                            data = json.loads("".join(lines))
+                            if isinstance(data, list):
+                                extracted_data.extend(data)
+                            else:
+                                extracted_data.append(data)
+                        except json.JSONDecodeError as e:
+                            logger.error("Error decoding %s in %s: %s", target_file, zip_path, e)
+    return extracted_data
 
 
 def read_file(file_input: list[str], filename: str | None):
