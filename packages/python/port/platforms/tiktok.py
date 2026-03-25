@@ -70,8 +70,29 @@ class TikTokFlow(FlowBuilder):
     def generate_file_prompt(self):
         return ph.generate_file_prompt("application/json, application/zip")
 
-    def validate_file(self, file):
-        return validate.validate_zip(DDP_CATEGORIES, file)
+    def validate_file(self, file) -> validate.ValidateInput:
+        import json
+        # Try zip first (TikTok also offers zip exports)
+        v = validate.validate_zip(DDP_CATEGORIES, file)
+        if v.get_status_code_id() == 0:
+            return v
+        # Fall back: plain JSON file
+        status_codes = [
+            validate.StatusCode(id=0, description="Valid TikTok JSON"),
+            validate.StatusCode(id=1, description="Invalid TikTok file"),
+        ]
+        v2 = validate.ValidateInput(status_codes, DDP_CATEGORIES)
+        try:
+            with open(file) as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                v2.set_current_status_code_by_id(0)
+                v2.current_ddp_category = DDP_CATEGORIES[0]
+            else:
+                v2.set_current_status_code_by_id(1)
+        except Exception:
+            v2.set_current_status_code_by_id(1)
+        return v2
 
     def extract_data(self, file: str, validation) -> ExtractionResult:
         tables = list(extract_tables(file, validation))
