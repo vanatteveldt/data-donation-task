@@ -11,9 +11,10 @@ from collections import Counter
 
 import pandas as pd
 
+import port.api.d3i_props as d3i_props
+import port.api.props as props
 import port.helpers.validate as validate
 from port.api.d3i_props import ExtractionResult
-from port.helpers.donation_flow import donation_table
 from port.helpers.flow_builder import FlowBuilder
 from port.helpers.parsers import create_table
 from port.helpers.Structure_extractor_libraries.IG_get_json_structure import structure_from_zip
@@ -83,16 +84,20 @@ def extract_tables(file: str, validation):
         try:
             df = create_table([file], entries)
             if not df.empty:
-                yield donation_table(name=key, df=df, title={"en": key, "nl": key, "es": key})
+                yield d3i_props.PropsUIPromptConsentFormTableViz(
+                    id=key,
+                    data_frame=df,
+                    title=props.Translatable({"en": key, "nl": key, "es": key}),
+                )
         except Exception as e:
-            logging.exception("Error in %s: %s", key, e)
+            logger.exception("Error in %s: %s", key, e)
 
     placeholder_json = structure_from_zip(file)
     df_placeholder = pd.DataFrame([{"Anonymized data structure": placeholder_json}])
-    yield donation_table(
-        name="placeholder",
-        df=df_placeholder,
-        title={"en": "Data structure", "es": "Estructura de datos", "nl": "Gegevensstructuur"},
+    yield d3i_props.PropsUIPromptConsentFormTableViz(
+        id="placeholder",
+        data_frame=df_placeholder,
+        title=props.Translatable({"en": "Data structure", "es": "Estructura de datos", "nl": "Gegevensstructuur"}),
     )
 
 
