@@ -4,6 +4,7 @@ This module contains helper functions that can be used during the data extractio
 import math
 import re
 import logging
+import unicodedata
 from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -611,7 +612,7 @@ class ZipArchiveReader:
 
     def __init__(self, zip_path: str, archive_members: list[str], errors: Counter):
         self.zip_path = zip_path
-        self.archive_members = archive_members
+        self.archive_members = [unicodedata.normalize("NFC", m) for m in archive_members]
         self.errors = errors
 
     def resolve_member(self, filename: str) -> str | None:
@@ -625,6 +626,7 @@ class ZipArchiveReader:
         4. Multiple matches → return None, log warning,
            increment errors["AmbiguousMemberMatch"].
         """
+        filename = unicodedata.normalize("NFC", filename)
         # 1. Exact match
         if filename in self.archive_members:
             return filename
@@ -722,3 +724,26 @@ class ZipArchiveReader:
 
         b = self._read_member_bytes(member)
         return RawExtractionResult(found=True, data=b, member_path=member)
+
+    def js(self, filename: str) -> JsonExtractionResult:
+        """Extract and parse an X/Twitter-style .js file.
+
+        Strips the leading variable-assignment prefix
+        (e.g. ``window.YTD.tweets.part0 = ``) and parses the remainder
+        as JSON. Returns JsonExtractionResult(found=False, data={}) if
+        the member is not in the archive.
+        """
+        member = self.resolve_member(filename)
+        if member is None:
+            return JsonExtractionResult(found=False, data={})
+        try:
+            b = self._read_member_bytes(member)
+            with io.TextIOWrapper(b, encoding="utf-8") as f:
+                lines = f.readlines()
+            lines[0] = re.sub(r"^.*? = ", "", lines[0])
+            data = json.loads("".join(lines))
+            return JsonExtractionResult(found=True, data=data, member_path=member)
+        except Exception as e:
+            logger.error("Exception reading js member %s: %s", filename, e)
+            self.errors["JsReadError"] += 1
+            return JsonExtractionResult(found=False, data={})
