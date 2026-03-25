@@ -39,7 +39,7 @@ DDP_CATEGORIES = [
 ]
 
 
-def extract_tables(file: str, validation):
+def extract_tables(file: str, validation, errors: Counter[str]):
     from port.helpers.entries_data import TIKTOK_ENTRIES
 
     for key, entries in TIKTOK_ENTRIES.items():
@@ -53,6 +53,7 @@ def extract_tables(file: str, validation):
                 )
         except Exception as e:
             logger.exception("Error in %s: %s", key, e)
+            errors[key] += 1
 
     placeholder_json = structure_from_json_file(file)
     df_placeholder = pd.DataFrame([{"Anonymized data structure": placeholder_json}])
@@ -95,8 +96,9 @@ class TikTokFlow(FlowBuilder):
         return v2
 
     def extract_data(self, file: str, validation) -> ExtractionResult:
-        tables = list(extract_tables(file, validation))
-        return ExtractionResult(tables=tables, errors=Counter())
+        errors: Counter[str] = Counter()
+        tables = list(extract_tables(file, validation, errors))
+        return ExtractionResult(tables=tables, errors=errors)
 
 
 def process(session_id):
