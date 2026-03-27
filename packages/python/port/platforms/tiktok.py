@@ -13,7 +13,6 @@ import logging
 from collections import Counter
 
 import pandas as pd
-
 import port.api.d3i_props as d3i_props
 import port.api.props as props
 import port.helpers.port_helpers as ph
@@ -21,7 +20,9 @@ import port.helpers.validate as validate
 from port.api.d3i_props import ExtractionResult
 from port.helpers.flow_builder import FlowBuilder
 from port.helpers.parsers import create_table
-from port.helpers.Structure_extractor_libraries.TT_get_json_structure import structure_from_json_file
+from port.helpers.Structure_extractor_libraries.TT_get_json_structure import (
+    structure_from_json_file,
+)
 from port.helpers.validate import DDPCategory, DDPFiletype, Language
 
 logger = logging.getLogger(__name__)
@@ -40,7 +41,7 @@ DDP_CATEGORIES = [
 
 
 def extract_tables(file: str, validation, errors: Counter[str]):
-    from port.helpers.entries_data import TIKTOK_ENTRIES
+    from port.helpers.entries_data_tiktok import TIKTOK_ENTRIES
 
     for key, entries in TIKTOK_ENTRIES.items():
         try:
@@ -73,6 +74,7 @@ class TikTokFlow(FlowBuilder):
 
     def validate_file(self, file) -> validate.ValidateInput:
         import json
+
         # Try zip first (TikTok also offers zip exports)
         v = validate.validate_zip(DDP_CATEGORIES, file)
         if v.get_status_code_id() == 0:

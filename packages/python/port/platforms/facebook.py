@@ -95,7 +95,7 @@ DDP_CATEGORIES = [
 
 
 def extract_tables(file: str, validation, errors: Counter[str]):
-    from port.helpers.entries_data import FB_ENTRIES
+    from port.helpers.entries_data_facebook import FB_ENTRIES
     from port.helpers.extraction_helpers import ZipArchiveReader
 
     reader = ZipArchiveReader(file, validation.archive_members, errors)

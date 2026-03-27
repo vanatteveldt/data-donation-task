@@ -6,24 +6,22 @@ This module contains an example flow of a Instagram data donation study
 Assumptions:
 It handles DDPs in the english language with filetype JSON.
 """
+
 import logging
 import re
 from collections import Counter
 
 import pandas as pd
-
 import port.api.d3i_props as d3i_props
 import port.api.props as props
 import port.helpers.validate as validate
 from port.api.d3i_props import ExtractionResult
 from port.helpers.flow_builder import FlowBuilder
 from port.helpers.parsers import create_table, extract_rows
-from port.helpers.Structure_extractor_libraries.IG_get_json_structure import structure_from_zip
-from port.helpers.validate import (
-    DDPCategory,
-    DDPFiletype,
-    Language,
+from port.helpers.Structure_extractor_libraries.IG_get_json_structure import (
+    structure_from_zip,
 )
+from port.helpers.validate import DDPCategory, DDPFiletype, Language
 
 logger = logging.getLogger(__name__)
 
@@ -91,13 +89,13 @@ def _paginated_to_df(reader, entries) -> pd.DataFrame:
     """Extract all _N.json pagination variants for the given IG_ENTRIES entries."""
     all_records = []
     for entry in entries:
-        parts = entry.filename.split('/')
-        parent = parts[-2] if len(parts) >= 2 else ''
+        parts = entry.filename.split("/")
+        parent = parts[-2] if len(parts) >= 2 else ""
         basename = parts[-1]
-        parent_pat = '[^/]+' if parent == '$USERNAME' else re.escape(parent)
-        stem = re.escape(basename[:-len('_1.json')])
-        base_pat = stem + r'_\d+\.json'
-        pattern = r'(^|/)' + parent_pat + '/' + base_pat + '$'
+        parent_pat = "[^/]+" if parent == "$USERNAME" else re.escape(parent)
+        stem = re.escape(basename[: -len("_1.json")])
+        base_pat = stem + r"_\d+\.json"
+        pattern = r"(^|/)" + parent_pat + "/" + base_pat + "$"
 
         for result in reader.json_all(pattern):
             data = result.data
@@ -131,7 +129,7 @@ def _post_comments_to_df(reader) -> pd.DataFrame:
 
 
 def extract_tables(file: str, validation, errors: Counter[str]):
-    from port.helpers.entries_data import IG_ENTRIES
+    from port.helpers.entries_data_instagram import IG_ENTRIES
     from port.helpers.extraction_helpers import ZipArchiveReader
 
     reader = ZipArchiveReader(file, validation.archive_members, errors)

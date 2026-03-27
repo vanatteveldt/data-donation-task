@@ -13,7 +13,7 @@ TIMESTAMP=$(date '+%Y-%m-%d_%H-%M-%S')
 
 # All platforms available in script.py
 # Comment out platforms not needed for a specific study
-platforms=("LinkedIn" "Instagram" "Facebook" "YouTube" "TikTok" "Netflix" "ChatGPT" "WhatsApp" "X" "Chrome")
+platforms=("Instagram" "Facebook" "YouTube" "TikTok"  "X")
 
 mkdir -p releases/${TIMESTAMP}
 
