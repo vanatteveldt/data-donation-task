@@ -54,6 +54,13 @@ class PropsUIPromptConsentFormTableViz:
     headers: Optional[dict[str, props.Translatable]] = None
     folded: Optional[bool] = False
     delete_option: Optional[bool] = True
+    data_frame_max_size: int = 10000
+
+    def __post_init__(self):
+        if self.data_frame_max_size < 1:
+            self.data_frame_max_size = 1
+        if len(self.data_frame) > self.data_frame_max_size:
+            self.data_frame = self.data_frame.head(self.data_frame_max_size).reset_index(drop=True)
 
     def translate_data_frame(self):
         if isinstance(self.data_frame, pd.DataFrame):
