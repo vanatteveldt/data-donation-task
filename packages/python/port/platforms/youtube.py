@@ -47,6 +47,36 @@ DDP_CATEGORIES = [
             "reacties.csv",
         ],
     ),
+    DDPCategory(
+        id="json_es",
+        ddp_filetype=DDPFiletype.JSON,
+        language=Language.ES,
+        known_files=[
+            "historial-de-reproducciones.json",
+            "historial-de-búsqueda.json",
+            "suscripciones.csv",
+        ],
+    ),
+    DDPCategory(
+        id="json_ro",
+        ddp_filetype=DDPFiletype.JSON,
+        language=Language.RO,
+        known_files=[
+            "istoricul-vizionărilor.json",
+            "istoricul căutărilor.json",
+            "abonamente.csv",
+        ],
+    ),
+    DDPCategory(
+        id="json_lt",
+        ddp_filetype=DDPFiletype.JSON,
+        language=Language.LT,
+        known_files=[
+            "žiūrėjimo istorija.json",
+            "paieškos istorija.json",
+            "prenumeratos.csv",
+        ],
+    ),
 ]
 
 

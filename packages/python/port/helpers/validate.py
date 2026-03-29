@@ -26,7 +26,10 @@ class Language(Enum):
     """
     EN = 1
     NL = 2
-    UNKNOWN = 3
+    ES = 3
+    LT = 4
+    RO = 5
+    UNKNOWN = 6
 
 
 class DDPFiletype(Enum):
