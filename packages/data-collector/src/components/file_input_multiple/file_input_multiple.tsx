@@ -120,6 +120,9 @@ const continueButtonLabel = (): Translatable => {
     .add('en', 'Continue')
     .add('de', 'Weiter')
     .add('nl', 'Verder')
+    .add('es', 'Continuar')
+    .add('lt', 'Tęsti')
+    .add('ro', 'Continuați')
 }
 
 const selectButtonLabel = (): Translatable => {
@@ -127,6 +130,9 @@ const selectButtonLabel = (): Translatable => {
     .add('en', 'Choose file(s)')
     .add('de', 'Datei(en) auswählen')
     .add('nl', 'Kies bestand(en)')
+    .add('es', 'Elegir archivo(s)')
+    .add('lt', 'Pasirinkti failą(-us)')
+    .add('ro', 'Alegeți fișier(e)')
 }
 
 const note = (): Translatable => {
@@ -134,5 +140,8 @@ const note = (): Translatable => {
     .add('en', 'Note: The process to extract the correct data from the file is done on your own computer. No data is stored or sent yet.')
     .add('de', 'Anmerkung: Die weitere Verarbeitung der Datei erfolgt auf Ihrem eigenen Endgerät. Es werden noch keine Daten gespeichert oder weiter gesendet.')
     .add('nl', 'NB: Het proces om de juiste gegevens uit het bestand te halen gebeurt op uw eigen computer. Er worden nog geen gegevens opgeslagen of verstuurd.')
+    .add('es', 'Nota: El proceso para extraer los datos correctos del archivo se realiza en su propio ordenador. Aún no se almacena ni se envía ningún dato.')
+    .add('lt', 'Pastaba: Tinkamų duomenų ištraukimo iš failo procesas atliekamas jūsų pačių kompiuteryje. Duomenys dar nėra saugomi ar siunčiami.')
+    .add('ro', 'Notă: Procesul de extragere a datelor corecte din fișier se efectuează pe propriul dvs. calculator. Nicio dată nu este stocată sau trimisă încă.')
 }
 

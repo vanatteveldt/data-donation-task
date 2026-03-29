@@ -172,11 +172,17 @@ function prepareTexts (locale: string): Record<string, string> {
   const texts = {
     errorMsg: {
       en: 'Could not create visualization',
-      nl: 'Kon visualisatie niet maken'
+      nl: 'Kon visualisatie niet maken',
+      es: 'No se pudo crear la visualización',
+      lt: 'Nepavyko sukurti vizualizacijos',
+      ro: 'Nu s-a putut crea vizualizarea'
     },
     noDataMsg: {
       en: 'No data',
-      nl: 'Geen data'
+      nl: 'Geen data',
+      es: 'Sin datos',
+      lt: 'Nėra duomenų',
+      ro: 'Fără date'
     }
   }
 

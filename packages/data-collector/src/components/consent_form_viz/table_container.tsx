@@ -240,7 +240,7 @@ function getTranslations(locale: string): Record<string, string> {
 }
 
 const translations = {
-  searchPlaceholder: new TextBundle().add("en", "Search").add("nl", "Zoeken"),
-  showTable: new TextBundle().add("en", "Show table").add("nl", "Tabel tonen"),
-  hideTable: new TextBundle().add("en", "Hide table").add("nl", "Tabel verbergen"),
+  searchPlaceholder: new TextBundle().add("en", "Search").add("nl", "Zoeken").add("es", "Buscar").add("lt", "Ieškoti").add("ro", "Căutați"),
+  showTable: new TextBundle().add("en", "Show table").add("nl", "Tabel tonen").add("es", "Mostrar tabla").add("lt", "Rodyti lentelę").add("ro", "Afișați tabelul"),
+  hideTable: new TextBundle().add("en", "Hide table").add("nl", "Tabel verbergen").add("es", "Ocultar tabla").add("lt", "Slėpti lentelę").add("ro", "Ascundeți tabelul"),
 }

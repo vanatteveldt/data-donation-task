@@ -155,7 +155,7 @@ def extract_tables(file: str, validation, errors: Counter[str]):
             yield d3i_props.PropsUIPromptConsentFormTableViz(
                 id="Post Comments",
                 data_frame=df,
-                title=props.Translatable({"en": "Post Comments", "nl": "Post Comments", "es": "Post Comments"}),
+                title=props.Translatable({"en": "Post Comments", "nl": "Post Comments", "es": "Comentarios de publicaciones", "lt": "Įrašų komentarai", "ro": "Comentarii la postări"}),
             )
     except Exception as e:
         logger.exception("Error in Post Comments: %s", e)
@@ -179,7 +179,7 @@ def extract_tables(file: str, validation, errors: Counter[str]):
     yield d3i_props.PropsUIPromptConsentFormTableViz(
         id="placeholder",
         data_frame=df_placeholder,
-        title=props.Translatable({"en": "Data structure", "es": "Estructura de datos", "nl": "Gegevensstructuur"}),
+        title=props.Translatable({"en": "Data structure", "es": "Estructura de datos", "nl": "Gegevensstructuur", "lt": "Duomenų struktūra", "ro": "Structura datelor"}),
     )
 
 

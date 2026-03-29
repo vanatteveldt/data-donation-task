@@ -30,18 +30,30 @@ class FlowBuilder:
             "submit_file_header": props.Translatable({
                 "en": f"Select your {self.platform_name} file",
                 "nl": f"Selecteer uw {self.platform_name} bestand",
+                "es": f"Seleccione su archivo de {self.platform_name}",
+                "lt": f"Pasirinkite savo {self.platform_name} failą",
+                "ro": f"Selectați fișierul dvs. {self.platform_name}",
             }),
             "review_data_header": props.Translatable({
                 "en": f"Your {self.platform_name} data",
                 "nl": f"Uw {self.platform_name} gegevens",
+                "es": f"Sus datos de {self.platform_name}",
+                "lt": f"Jūsų {self.platform_name} duomenys",
+                "ro": f"Datele dvs. {self.platform_name}",
             }),
             "retry_header": props.Translatable({
                 "en": "Try again",
                 "nl": "Probeer opnieuw",
+                "es": "Intentar de nuevo",
+                "lt": "Bandyti dar kartą",
+                "ro": "Încercați din nou",
             }),
             "review_data_description": props.Translatable({
                 "en": f"Below you will find a curated selection of {self.platform_name} data.",
                 "nl": f"Hieronder vindt u een zorgvuldig samengestelde selectie van {self.platform_name} gegevens.",
+                "es": f"A continuación encontrará una selección curada de datos de {self.platform_name}.",
+                "lt": f"Žemiau rasite atrinktą {self.platform_name} duomenų pasirinkimą.",
+                "ro": f"Mai jos veți găsi o selecție curatoriată de date {self.platform_name}.",
             }),
         }
 

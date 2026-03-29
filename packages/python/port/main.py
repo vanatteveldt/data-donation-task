@@ -26,17 +26,20 @@ def error_flow(platform: str | None, tb: str):
         tb: Full traceback string from traceback.format_exc().
     """
     header = props.PropsUIHeader(
-        props.Translatable({"nl": "Er is iets misgegaan", "en": "Something went wrong"})
+        props.Translatable({"nl": "Er is iets misgegaan", "en": "Something went wrong", "es": "Algo salió mal", "lt": "Kažkas nepavyko", "ro": "Ceva a mers greșit"})
     )
     body = [
-        props.PropsUIPromptText(text=props.Translatable({"nl": tb, "en": tb})),
+        props.PropsUIPromptText(text=props.Translatable({"nl": tb, "en": tb, "es": tb, "lt": tb, "ro": tb})),
         props.PropsUIPromptConfirm(
             text=props.Translatable({
                 "nl": "Wilt u de fout rapporteren zodat we het probleem kunnen oplossen?",
                 "en": "Would you like to report this error so we can fix the problem?",
+                "es": "¿Le gustaría informar este error para que podamos solucionar el problema?",
+                "lt": "Ar norėtumėte pranešti apie šią klaidą, kad galėtume ją ištaisyti?",
+                "ro": "Doriți să raportați această eroare pentru a putea rezolva problema?",
             }),
-            ok=props.Translatable({"nl": "Fout rapporteren", "en": "Report error"}),
-            cancel=props.Translatable({"nl": "Overslaan", "en": "Skip"}),
+            ok=props.Translatable({"nl": "Fout rapporteren", "en": "Report error", "es": "Informar error", "lt": "Pranešti apie klaidą", "ro": "Raportați eroarea"}),
+            cancel=props.Translatable({"nl": "Overslaan", "en": "Skip", "es": "Omitir", "lt": "Praleisti", "ro": "Omiteți"}),
         ),
     ]
     page = props.PropsUIPageDataSubmission(platform or "error", header, body)

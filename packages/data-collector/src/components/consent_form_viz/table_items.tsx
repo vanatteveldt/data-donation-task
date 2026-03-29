@@ -80,8 +80,8 @@ function getTranslations (locale: string): Record<string, string> {
 }
 
 const translations = {
-  columns: new TextBundle().add('en', 'columns').add('nl', 'kolommen'),
-  rows: new TextBundle().add('en', 'rows').add('nl', 'rijen'),
-  noData: new TextBundle().add('en', 'no data').add('nl', 'geen data'),
-  deleted: new TextBundle().add('en', 'deleted').add('nl', 'verwijderd')
+  columns: new TextBundle().add('en', 'columns').add('nl', 'kolommen').add('es', 'columnas').add('lt', 'stulpeliai').add('ro', 'coloane'),
+  rows: new TextBundle().add('en', 'rows').add('nl', 'rijen').add('es', 'filas').add('lt', 'eilutės').add('ro', 'rânduri'),
+  noData: new TextBundle().add('en', 'no data').add('nl', 'geen data').add('es', 'sin datos').add('lt', 'nėra duomenų').add('ro', 'fără date'),
+  deleted: new TextBundle().add('en', 'deleted').add('nl', 'verwijderd').add('es', 'eliminado').add('lt', 'ištrinta').add('ro', 'șters')
 }
