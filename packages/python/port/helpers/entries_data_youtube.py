@@ -76,24 +76,6 @@ YT_ENTRIES: dict[str, list[Entry]] = {
             ),
         ),
     ],
-    "Historial-De-BúSqueda": [
-        Entry(
-            table="Historial-De-BúSqueda",
-            filename="historial/historial-de-búsqueda.json",
-            tree=Node(
-                columns={
-                    "header": ("header",),
-                    "title": ("title",),
-                    "titleUrl": ("titleUrl",),
-                    "description": ("description",),
-                    "time": ("time",),
-                    "products": ("products",),
-                    "activityControls": ("activityControls",),
-                },
-                children={"details": Node(columns={"name": ("name",)}, children={})},
-            ),
-        ),
-    ],
     "Historial-De-Búsqueda": [
         Entry(
             table="Historial-De-Búsqueda",
