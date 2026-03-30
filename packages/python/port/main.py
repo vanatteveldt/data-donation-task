@@ -26,7 +26,7 @@ def error_flow(platform: str | None, tb: str):
         tb: Full traceback string from traceback.format_exc().
     """
     header = props.PropsUIHeader(
-        props.Translatable({"nl": "Er is iets misgegaan", "en": "Something went wrong", "es": "Algo salió mal", "lt": "Kažkas nepavyko", "ro": "Ceva a mers greșit"})
+        props.Translatable({"nl": "Er is iets misgegaan", "en": "Something went wrong", "es": "Algo salió mal", "lt": "Kažkas nepavyko", "ro": "Ceva nu a mers bine"})
     )
     body = [
         props.PropsUIPromptText(text=props.Translatable({"nl": tb, "en": tb, "es": tb, "lt": tb, "ro": tb})),

@@ -182,7 +182,7 @@ function prepareTexts (locale: string): Record<string, string> {
       nl: 'Geen data',
       es: 'Sin datos',
       lt: 'Nėra duomenų',
-      ro: 'Fără date'
+      ro: 'Nu există date'
     }
   }
 
