@@ -102,7 +102,7 @@ def generate_file_prompt(
             "en": "Please follow the download instructions and choose the file that you stored on your device.",
             "nl": "Volg de download instructies en kies het bestand dat u opgeslagen heeft op uw apparaat.",
             "es": "Por favor, siga las instrucciones de descarga y elija el archivo que guardó en su dispositivo.",
-            "lt": "Sekite atsisiuntimo instrukcijas ir pasirinkite failą, kurį išsaugojote savo įrenginyje.",
+            "lt": "Vykdykite atsisiuntimo instrukcijas ir pasirinkite failą, kurį išsaugojote savo įrenginyje",
             "ro": "Vă rugăm să urmați instrucțiunile de descărcare și să alegeți fișierul pe care l-ați salvat pe dispozitivul dvs.",
         }
     )

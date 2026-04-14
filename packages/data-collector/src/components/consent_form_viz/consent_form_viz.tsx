@@ -241,6 +241,6 @@ const defaultDescription = new TextBundle()
   .add('de', 'Legen Sie fest, ob Sie die untenstehenden Daten teilen möchten. Überprüfen Sie die Daten sorgfältig und passen Sie sie bei Bedarf an. Mit Ihrem Beitrag helfen Sie der zuvor beschriebenen Forschung. Vielen Dank im Voraus.')
   .add('nl', 'Bepaal of u de onderstaande gegevens wilt delen. Bekijk de gegevens zorgvuldig en pas zo nodig aan. Met uw bijdrage helpt u het eerder beschreven onderzoek. Alvast hartelijk dank.')
   .add('es', 'Determine si desea compartir los datos a continuación. Revise cuidadosamente los datos y ajústelos si es necesario. Con su contribución, ayuda a la investigación descrita anteriormente. Gracias de antemano.')
-  .add('lt', 'Nuspręskite, ar norite pasidalinti žemiau pateiktais duomenimis. Atidžiai patikrinkite duomenis ir, jei reikia, juos pakoreguokite. Savo indėliu padėsite anksčiau aprašytam tyrimui. Iš anksto dėkojame.')
+  .add('lt', 'Nuspręskite, ar norite pasidalinti žemiau pateiktais duomenimis. Atidžiai patikrinkite duomenis ir, jei reikia, juos pakoreguokite. Savo indėliu prisidėsite prie anksčiau aprašyto tyrimo. Iš anksto dėkojame.')
   .add('ro', 'Determinați dacă doriți să împărtășiți datele de mai jos. Verificați cu atenție datele și ajustați dacă este necesar. Contribuția dvs. ajută la cercetarea descrisă anterior. Mulțumim anticipat.')
 

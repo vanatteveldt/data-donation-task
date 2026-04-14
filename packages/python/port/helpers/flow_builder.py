@@ -52,7 +52,7 @@ class FlowBuilder:
                 "en": f"Below you will find a curated selection of {self.platform_name} data.",
                 "nl": f"Hieronder vindt u een zorgvuldig samengestelde selectie van {self.platform_name} gegevens.",
                 "es": f"A continuación encontrará una selección curada de datos de {self.platform_name}.",
-                "lt": f"Žemiau rasite atrinktą {self.platform_name} duomenų pasirinkimą.",
+                "lt": f"Žemiau pateikiami atrinkti {self.platform_name} duomenys",
                 "ro": f"Mai jos veți găsi o selecție curată de date {self.platform_name}.",
             }),
         }
