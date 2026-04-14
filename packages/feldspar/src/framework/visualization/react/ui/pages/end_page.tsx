@@ -13,6 +13,19 @@ type Props = Weak<PropsUIPageEnd> & ReactFactoryContext;
 export const EndPage = (props: Props): JSX.Element => {
   const { title, text } = prepareCopy(props);
 
+  const { resolve } = props;
+
+  // From https://github.com/d3i-infra/data-donation-task/pull/58
+  // Auto-resolve: this page has no user interaction, so resolve immediately
+  // to unblock the Python generator. ScriptWrapper will then produce
+  // CommandSystemExit, signaling the host to mark the task complete.
+  // See feldspar/AD0005.
+  React.useEffect(() => {
+    if (resolve) {
+      resolve({ __type__: "PayloadVoid", value: undefined });
+    }
+  }, []);
+
   const body: JSX.Element = (
     <>
       <Title1 text={title} />
@@ -58,8 +71,8 @@ const text = new TextBundle()
     "Grazie per la tua partecipazione. Ora puoi chiudere la pagina o aggiornare per riavviare il flusso di donazione."
   )
   .add(
-  "es",
-  "Gracias por su participación. Ahora puede cerrar la página o actualizarla para reiniciar el flujo de donación de datos."
+    "es",
+    "Gracias por su participación. Ahora puede cerrar la página o actualizarla para reiniciar el flujo de donación de datos."
   )
   .add(
     "nl",
