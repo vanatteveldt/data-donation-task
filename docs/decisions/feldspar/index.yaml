@@ -69,7 +69,8 @@ decisions:
             - termination
             - host-integration
         links:
-            precedes: []
+            precedes:
+                - "0005"
             succeeds: []
         comments:
             - author: Danielle McCool
@@ -78,3 +79,19 @@ decisions:
             - author: Danielle McCool
               date: "2026-03-17 13:24:17"
               comment: "2"
+    "0005":
+        adr_id: "0005"
+        title: Remove EndPage and rely on host completion UI
+        status: decided
+        tags:
+            - end-page
+            - completion
+            - host-integration
+        links:
+            precedes: []
+            succeeds:
+                - "0004"
+        comments:
+            - author: Danielle McCool
+              date: "2026-04-14 09:00:00"
+              comment: "1"
