@@ -39,11 +39,14 @@ Earlier releases used sequential numbering (#1-#5) matching the upstream
   `PayloadString`/WORKERFS support (kept for SURF Research Cloud
   backwards compatibility per `feldspar/AD0003`) is retired; SRC
   consumers must migrate to `PayloadFile`.
-* New host log milestone `[<Platform>] Upload prompt shown`
-  (emitted before the file prompt is rendered) and
-  `[<Platform>] Upload received: type=…, size=…` (emitted
-  immediately after upload, before safety check). Replaces the
-  previous post-materialize `[<Platform>] File received` message.
+* New host log milestones: `[<Platform>] Upload prompt sent`
+  (emitted before the file prompt render command goes to the host),
+  `[<Platform>] Upload received: size=…` (emitted immediately after
+  a `PayloadFile` upload, before the safety check), and
+  `[<Platform>] Upload skipped: type=<X>` (emitted when a
+  non-`PayloadFile` payload arrives, distinguishing participant-skip
+  from unexpected payload types). Replaces the previous
+  post-materialize `[<Platform>] File received` message.
 
 ### Removed
 
