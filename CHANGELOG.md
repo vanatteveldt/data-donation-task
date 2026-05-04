@@ -6,6 +6,8 @@ Earlier releases used sequential numbering (#1-#5) matching the upstream
 
 ## [Unreleased]
 
+## v2.0.1 — 2026-05-04
+
 ### Fixed
 
 * 2+ GiB upload `NotReadableError` regression. `FlowBuilder` no longer
