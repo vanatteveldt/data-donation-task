@@ -79,27 +79,27 @@ def generate_retry_prompt(platform_name: str) -> props.PropsUIPromptConfirm:
         "en": (
             f"Unfortunately, we cannot process your {platform_name} file. Try again to select a different file. "
             f"If you selected the right file, something probably went wrong in requesting it from {platform_name}. "
-            "Please download the file again, and pay careful attention to the download instructions."
+            "Please request the file again, and pay careful attention to the instructions."
         ),
         "nl": (
             f"Helaas, kunnen we uw {platform_name} bestand niet verwerken. Probeer opnieuw als u een ander bestand wilt kiezen. "
             f"Als u wel het goede bestand heeft gekozen, is er waarschijnlijk iets misgegaan bij het opvragen van het bestand bij {platform_name}. "
-            "Vraag a.u.b. het bestand opnieuw op, en lees daarbij zorgvuldig de downloadinstructies."
+            "Vraag a.u.b. het bestand opnieuw op, en lees daarbij zorgvuldig de instructies."
         ),
         "es": (
             f"Lamentablemente, no podemos procesar su archivo de {platform_name}. Intente de nuevo para seleccionar un archivo diferente. "
             f"Si seleccionó el archivo correcto, probablemente algo salió mal al solicitarlo a {platform_name}. "
-            "Por favor, descargue el archivo nuevamente y preste mucha atención a las instrucciones de descarga."
+            "Por favor, solicite el archivo nuevamente y preste mucha atención a las instrucciones."
         ),
         "lt": (
             f"Deja, negalime apdoroti jūsų {platform_name} failo. Bandykite dar kartą, kad pasirinktumėte kitą failą. "
             f"Jei pasirinkote tinkamą failą, greičiausiai kažkas nutiko negerai jį užsakant iš {platform_name}. "
-            "Prašome dar kartą atsisiųsti failą ir atidžiai laikytis atsisiuntimo instrukcijų."
+            "Prašome dar kartą paprašyti failo ir atidžiai laikytis instrukcijų."
         ),
         "ro": (
             f"Din păcate, nu putem procesa fișierul dvs. {platform_name}. Încercați din nou pentru a selecta un alt fișier. "
             f"Dacă ați selectat fișierul corect, probabil că ceva nu a mers bine la solicitarea acestuia de la {platform_name}. "
-            "Vă rugăm să descărcați fișierul din nou și să acordați atenție instrucțiunilor de descărcare."
+            "Vă rugăm să solicitați fișierul din nou și să acordați atenție instrucțiunilor."
         ),
     }
     hint = get_validation_hint(platform_name)
