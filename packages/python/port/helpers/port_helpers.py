@@ -2,7 +2,12 @@ import logging
 
 import port.api.d3i_props as d3i_props
 import port.api.props as props
-from port.api.commands import CommandSystemDonate, CommandSystemExit, CommandSystemLog, CommandUIRender
+from port.api.commands import (
+    CommandSystemDonate,
+    CommandSystemExit,
+    CommandSystemLog,
+    CommandUIRender,
+)
 from port.helpers import uploads
 
 _logger = logging.getLogger(__name__)
@@ -45,6 +50,17 @@ def render_page(
     return CommandUIRender(page)
 
 
+def get_validation_hint(platform_name: str) -> props.Translations | None:
+    if platform_name in {"YouTube", "Instagram", "Facebook", "TikTok"}:
+        return {
+            "en": "In particular, make sure that the file format is set to 'json'",
+            "nl": "Check in het bijzonder dat het bestandsformaat 'json' is gekozen",
+            "es": "En particular, asegúrese de que el formato del archivo esté establecido en 'json'",
+            "lt": "Visų pirma, įsitikinkite, kad failo formatas nustatytas į 'json'",
+            "ro": "În special, asigurați-vă că formatul fișierului este setat la 'json'",
+        }
+
+
 def generate_retry_prompt(platform_name: str) -> props.PropsUIPromptConfirm:
     """
     Generate a bilingual retry prompt for file processing errors.
@@ -59,15 +75,38 @@ def generate_retry_prompt(platform_name: str) -> props.PropsUIPromptConfirm:
         platform_name: The name of the platform whose file could not be processed.
     """
 
-    text = props.Translatable(
-        {
-            "en": f"Unfortunately, we cannot process your {platform_name} file. Continue, if you are sure that you selected the right file. Try again to select a different file.",
-            "nl": f"Helaas, kunnen we uw {platform_name} bestand niet verwerken. Weet u zeker dat u het juiste bestand heeft gekozen? Ga dan verder. Probeer opnieuw als u een ander bestand wilt kiezen.",
-            "es": f"Lamentablemente, no podemos procesar su archivo de {platform_name}. Continúe si está seguro de haber seleccionado el archivo correcto. Intente de nuevo para seleccionar un archivo diferente.",
-            "lt": f"Deja, negalime apdoroti jūsų {platform_name} failo. Tęskite, jei esate tikri, kad pasirinkote tinkamą failą. Bandykite dar kartą, kad pasirinktumėte kitą failą.",
-            "ro": f"Din păcate, nu putem procesa fișierul dvs. {platform_name}. Continuați dacă sunteți sigur că ați selectat fișierul corect. Încercați din nou pentru a selecta un alt fișier.",
-        }
-    )
+    text: props.Translations = {
+        "en": (
+            f"Unfortunately, we cannot process your {platform_name} file. Try again to select a different file. "
+            f"If you selected the right file, something probably went wrong in requesting it from {platform_name}. "
+            "Please download the file again, and pay careful attention to the download instructions."
+        ),
+        "nl": (
+            f"Helaas, kunnen we uw {platform_name} bestand niet verwerken. Probeer opnieuw als u een ander bestand wilt kiezen. "
+            f"Als u wel het goede bestand heeft gekozen, is er waarschijnlijk iets misgegaan bij het opvragen van het bestand bij {platform_name}. "
+            "Vraag a.u.b. het bestand opnieuw op, en lees daarbij zorgvuldig de downloadinstructies."
+        ),
+        "es": (
+            f"Lamentablemente, no podemos procesar su archivo de {platform_name}. Intente de nuevo para seleccionar un archivo diferente. "
+            f"Si seleccionó el archivo correcto, probablemente algo salió mal al solicitarlo a {platform_name}. "
+            "Por favor, descargue el archivo nuevamente y preste mucha atención a las instrucciones de descarga."
+        ),
+        "lt": (
+            f"Deja, negalime apdoroti jūsų {platform_name} failo. Bandykite dar kartą, kad pasirinktumėte kitą failą. "
+            f"Jei pasirinkote tinkamą failą, greičiausiai kažkas nutiko negerai jį užsakant iš {platform_name}. "
+            "Prašome dar kartą atsisiųsti failą ir atidžiai laikytis atsisiuntimo instrukcijų."
+        ),
+        "ro": (
+            f"Din păcate, nu putem procesa fișierul dvs. {platform_name}. Încercați din nou pentru a selecta un alt fișier. "
+            f"Dacă ați selectat fișierul corect, probabil că ceva nu a mers bine la solicitarea acestuia de la {platform_name}. "
+            "Vă rugăm să descărcați fișierul din nou și să acordați atenție instrucțiunilor de descărcare."
+        ),
+    }
+    hint = get_validation_hint(platform_name)
+    if hint:
+        for lang, msg in text.items():
+            text[lang] = f"{msg} {hint.get(lang)}"
+
     ok = props.Translatable(
         {
             "en": "Try again",
@@ -78,7 +117,7 @@ def generate_retry_prompt(platform_name: str) -> props.PropsUIPromptConfirm:
         }
     )
     cancel = props.Translatable({"en": "Continue", "nl": "Doorgaan", "es": "Continuar", "lt": "Tęsti", "ro": "Continuați"})
-    return props.PropsUIPromptConfirm(text, ok, cancel)
+    return props.PropsUIPromptConfirm(props.Translatable(text), ok, cancel)
 
 
 def generate_file_prompt(
