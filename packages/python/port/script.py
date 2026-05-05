@@ -44,4 +44,3 @@ def process(session_id: str, platform: str | None = None):
         yield from flow.start_flow()
 
     yield from ph.emit_log("info", "Study complete")
-    yield ph.render_end_page()
