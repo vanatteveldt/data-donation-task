@@ -68,7 +68,15 @@ def generate_retry_prompt(platform_name: str) -> props.PropsUIPromptConfirm:
             "ro": f"Din păcate, nu putem procesa fișierul dvs. {platform_name}. Continuați dacă sunteți sigur că ați selectat fișierul corect. Încercați din nou pentru a selecta un alt fișier.",
         }
     )
-    ok = props.Translatable({"en": "Try again", "nl": "Probeer opnieuw", "es": "Intentar de nuevo", "lt": "Bandyti dar kartą", "ro": "Încercați din nou"})
+    ok = props.Translatable(
+        {
+            "en": "Try again",
+            "nl": "Probeer opnieuw",
+            "es": "Intentar de nuevo",
+            "lt": "Bandyti dar kartą",
+            "ro": "Încercați din nou",
+        }
+    )
     cancel = props.Translatable({"en": "Continue", "nl": "Doorgaan", "es": "Continuar", "lt": "Tęsti", "ro": "Continuați"})
     return props.PropsUIPromptConfirm(text, ok, cancel)
 
@@ -130,10 +138,24 @@ def generate_review_data_prompt(
         and default values for donate question and button.
     """
     donate_question = props.Translatable(
-        {"en": "Do you want to share this data for research?", "nl": "Wilt u deze gegevens delen voor onderzoek?", "es": "¿Desea compartir estos datos para investigación?", "lt": "Ar norite pasidalinti šiais duomenimis tyrimų tikslais?", "ro": "Doriți să împărtășiți aceste date pentru cercetare?"}
+        {
+            "en": "Do you want to share this data for research?",
+            "nl": "Wilt u deze gegevens delen voor onderzoek?",
+            "es": "¿Desea compartir estos datos para investigación?",
+            "lt": "Ar norite pasidalinti šiais duomenimis tyrimų tikslais?",
+            "ro": "Doriți să împărtășiți aceste date pentru cercetare?",
+        }
     )
 
-    donate_button = props.Translatable({"en": "Yes, share for research", "nl": "Ja, deel voor onderzoek", "es": "Sí, compartir para investigación", "lt": "Taip, dalintis tyrimų tikslais", "ro": "Da, împărtășiți pentru cercetare"})
+    donate_button = props.Translatable(
+        {
+            "en": "Yes, share for research",
+            "nl": "Ja, deel voor onderzoek",
+            "es": "Sí, compartir para investigación",
+            "lt": "Taip, dalintis tyrimų tikslais",
+            "ro": "Da, împărtășiți pentru cercetare",
+        }
+    )
 
     return d3i_props.PropsUIPromptConsentFormViz(
         tables=table_list, description=description, donate_question=donate_question, donate_button=donate_button
@@ -280,22 +302,26 @@ def render_no_data_page(platform_name: str) -> CommandUIRender:
     Caller should yield and await response before returning.
     """
     header = props.PropsUIHeader(
-        props.Translatable({
-            "en": f"No data found",
-            "nl": f"Geen gegevens gevonden",
-            "es": "No se encontraron datos",
-            "lt": "Duomenų nerasta",
-            "ro": "Nu s-au găsit date",
-        })
+        props.Translatable(
+            {
+                "en": f"No data found",
+                "nl": f"Geen gegevens gevonden",
+                "es": "No se encontraron datos",
+                "lt": "Duomenų nerasta",
+                "ro": "Nu s-au găsit date",
+            }
+        )
     )
     body = props.PropsUIPromptConfirm(
-        text=props.Translatable({
-            "en": f"Unfortunately, no relevant data was found in your {platform_name} file.",
-            "nl": f"Helaas zijn er geen relevante gegevens gevonden in uw {platform_name} bestand.",
-            "es": f"Desafortunadamente, no se encontraron datos relevantes en su archivo de {platform_name}.",
-            "lt": f"Deja, jūsų {platform_name} faile nerasta jokių aktualių duomenų.",
-            "ro": f"Din păcate, nu s-au găsit date relevante în fișierul dvs. {platform_name}.",
-        }),
+        text=props.Translatable(
+            {
+                "en": f"Unfortunately, no relevant data was found in your {platform_name} file.",
+                "nl": f"Helaas zijn er geen relevante gegevens gevonden in uw {platform_name} bestand.",
+                "es": f"Desafortunadamente, no se encontraron datos relevantes en su archivo de {platform_name}.",
+                "lt": f"Deja, jūsų {platform_name} faile nerasta jokių aktualių duomenų.",
+                "ro": f"Din păcate, nu s-au găsit date relevante în fișierul dvs. {platform_name}.",
+            }
+        ),
         ok=props.Translatable({"en": "Continue", "nl": "Doorgaan", "es": "Continuar", "lt": "Tęsti", "ro": "Continuați"}),
         cancel=props.Translatable({"en": "Continue", "nl": "Doorgaan", "es": "Continuar", "lt": "Tęsti", "ro": "Continuați"}),
     )
@@ -309,25 +335,29 @@ def render_safety_error_page(platform_name: str, error: Exception) -> CommandUIR
     Caller should yield and await response before returning.
     """
     header = props.PropsUIHeader(
-        props.Translatable({
-            "en": "File cannot be processed",
-            "nl": "Bestand kan niet worden verwerkt",
-            "es": "El archivo no se puede procesar",
-            "lt": "Failo apdoroti nepavyksta",
-            "ro": "Fișierul nu poate fi procesat",
-        })
+        props.Translatable(
+            {
+                "en": "File cannot be processed",
+                "nl": "Bestand kan niet worden verwerkt",
+                "es": "El archivo no se puede procesar",
+                "lt": "Failo apdoroti nepavyksta",
+                "ro": "Fișierul nu poate fi procesat",
+            }
+        )
     )
 
     if isinstance(error, uploads.TranslatableException):
-        text = error.get_translatable()
+        text = error.get_translatable(platform_name)
     else:
-        text = props.Translatable({
-            "en": f"Your {platform_name} file could not be processed: {error}",
-            "nl": f"Uw {platform_name} bestand kon niet worden verwerkt: {error}",
-            "es": f"Su archivo de {platform_name} no se pudo procesar: {error}",
-            "lt": f"Jūsų {platform_name} failo apdoroti nepavyko: {error}",
-            "ro": f"Fișierul dvs. {platform_name} nu a putut fi procesat: {error}",
-        })
+        text = props.Translatable(
+            {
+                "en": f"Your {platform_name} file could not be processed: {error}",
+                "nl": f"Uw {platform_name} bestand kon niet worden verwerkt: {error}",
+                "es": f"Su archivo de {platform_name} no se pudo procesar: {error}",
+                "lt": f"Jūsų {platform_name} failo apdoroti nepavyko: {error}",
+                "ro": f"Fișierul dvs. {platform_name} nu a putut fi procesat: {error}",
+            }
+        )
 
     body = props.PropsUIPromptConfirm(
         text=text,
@@ -344,22 +374,26 @@ def render_donate_failure_page(platform_name: str) -> CommandUIRender:
     Caller should yield and await response before returning.
     """
     header = props.PropsUIHeader(
-        props.Translatable({
-            "en": "Data submission failed",
-            "nl": "Gegevensinzending mislukt",
-            "es": "Error al enviar los datos",
-            "lt": "Nepavyko pateikti duomenų",
-            "ro": "Trimiterea datelor a eșuat",
-        })
+        props.Translatable(
+            {
+                "en": "Data submission failed",
+                "nl": "Gegevensinzending mislukt",
+                "es": "Error al enviar los datos",
+                "lt": "Nepavyko pateikti duomenų",
+                "ro": "Trimiterea datelor a eșuat",
+            }
+        )
     )
     body = props.PropsUIPromptConfirm(
-        text=props.Translatable({
-            "en": f"Unfortunately, your {platform_name} data could not be submitted. Please try again later.",
-            "nl": f"Helaas konden uw {platform_name} gegevens niet worden ingediend. Probeer het later opnieuw.",
-            "es": f"Desafortunadamente, sus datos de {platform_name} no pudieron ser enviados. Por favor, inténtelo de nuevo más tarde.",
-            "lt": f"Deja, jūsų {platform_name} duomenų nepavyko pateikti. Bandykite dar kartą vėliau.",
-            "ro": f"Din păcate, datele dvs. {platform_name} nu au putut fi trimise. Vă rugăm să încercați din nou mai târziu.",
-        }),
+        text=props.Translatable(
+            {
+                "en": f"Unfortunately, your {platform_name} data could not be submitted. Please try again later.",
+                "nl": f"Helaas konden uw {platform_name} gegevens niet worden ingediend. Probeer het later opnieuw.",
+                "es": f"Desafortunadamente, sus datos de {platform_name} no pudieron ser enviados. Por favor, inténtelo de nuevo más tarde.",
+                "lt": f"Deja, jūsų {platform_name} duomenų nepavyko pateikti. Bandykite dar kartą vėliau.",
+                "ro": f"Din păcate, datele dvs. {platform_name} nu au putut fi trimise. Vă rugăm să încercați din nou mai târziu.",
+            }
+        ),
         ok=props.Translatable({"en": "Continue", "nl": "Doorgaan", "es": "Continuar", "lt": "Tęsti", "ro": "Continuați"}),
         cancel=props.Translatable({"en": "Continue", "nl": "Doorgaan", "es": "Continuar", "lt": "Tęsti", "ro": "Continuați"}),
     )
