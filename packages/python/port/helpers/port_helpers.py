@@ -3,6 +3,7 @@ import logging
 import port.api.d3i_props as d3i_props
 import port.api.props as props
 from port.api.commands import CommandSystemDonate, CommandSystemExit, CommandSystemLog, CommandUIRender
+from port.helpers import uploads
 
 _logger = logging.getLogger(__name__)
 
@@ -316,14 +317,20 @@ def render_safety_error_page(platform_name: str, error: Exception) -> CommandUIR
             "ro": "Fișierul nu poate fi procesat",
         })
     )
-    body = props.PropsUIPromptConfirm(
-        text=props.Translatable({
+
+    if isinstance(error, uploads.TranslatableException):
+        text = error.get_translatable()
+    else:
+        text = props.Translatable({
             "en": f"Your {platform_name} file could not be processed: {error}",
             "nl": f"Uw {platform_name} bestand kon niet worden verwerkt: {error}",
             "es": f"Su archivo de {platform_name} no se pudo procesar: {error}",
             "lt": f"Jūsų {platform_name} failo apdoroti nepavyko: {error}",
             "ro": f"Fișierul dvs. {platform_name} nu a putut fi procesat: {error}",
-        }),
+        })
+
+    body = props.PropsUIPromptConfirm(
+        text=text,
         ok=props.Translatable({"en": "Continue", "nl": "Doorgaan", "es": "Continuar", "lt": "Tęsti", "ro": "Continuați"}),
         cancel=props.Translatable({"en": "Continue", "nl": "Doorgaan", "es": "Continuar", "lt": "Tęsti", "ro": "Continuați"}),
     )

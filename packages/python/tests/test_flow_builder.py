@@ -203,7 +203,7 @@ class TestSafetyErrorPath:
 
     @patch(
         "port.helpers.flow_builder.uploads.check_payload_size",
-        side_effect=FileTooLargeError("too big"),
+        side_effect=FileTooLargeError(size=3 * 1024**3),
     )
     def test_safety_error_shows_page_then_returns(self, mock_check):
         flow = StubFlow()

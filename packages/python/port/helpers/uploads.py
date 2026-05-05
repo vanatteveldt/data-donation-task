@@ -11,14 +11,67 @@ is the source of truth for size policy decisions.
 """
 import logging
 
+import port.api.props as props
+
 logger = logging.getLogger(__name__)
 
 MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024 * 1024  # 2 GiB
 CHUNKED_EXPORT_SENTINEL_BYTES = MAX_FILE_SIZE_BYTES  # same value, distinct intent
 
 
-class FileTooLargeError(Exception):
+class TranslatableException(Exception):
+    """Exception that carries its own translatable user-facing message.
+
+    Renderers call ``get_translatable()`` to obtain a ``Translatable``
+    they can drop straight into a UI prompt, so they stay agnostic to
+    specific error types.
+    """
+
+    def get_translatable(self) -> props.Translatable:
+        raise NotImplementedError
+
+
+class FileTooLargeError(TranslatableException):
     """Raised when a file exceeds MAX_FILE_SIZE_BYTES."""
+
+    size: int
+
+    def __init__(self, size: int):
+        self.size = size
+        super().__init__(
+            f"File is {size} bytes, exceeding limit of {MAX_FILE_SIZE_BYTES} bytes"
+        )
+
+    def get_translatable(self) -> props.Translatable:
+        f = f"{self.size / 1_000_000_000:.1f} GB"
+        limit = "2 GB"
+        return props.Translatable({
+            "en": (
+                f"Your file is {f}, exceeding the limit of {limit}. "
+                "Please check the download instructions carefully and request "
+                "your data again from the provider."
+            ),
+            "nl": (
+                f"Uw bestand is {f} en overschrijdt de limiet van {limit}. "
+                "Controleer de downloadinstructies zorgvuldig en vraag uw "
+                "gegevens opnieuw aan bij de aanbieder."
+            ),
+            "es": (
+                f"Su archivo es de {f}, superando el límite de {limit}. "
+                "Por favor, revise atentamente las instrucciones de descarga y "
+                "solicite sus datos nuevamente al proveedor."
+            ),
+            "lt": (
+                f"Jūsų failas yra {f}, viršija {limit} ribą. "
+                "Atidžiai peržiūrėkite atsisiuntimo instrukcijas ir dar kartą "
+                "paprašykite duomenų iš teikėjo."
+            ),
+            "ro": (
+                f"Fișierul dvs. are {f}, depășind limita de {limit}. "
+                "Vă rugăm să verificați cu atenție instrucțiunile de descărcare "
+                "și să solicitați din nou datele de la furnizor."
+            ),
+        })
 
 
 class ChunkedExportError(Exception):
@@ -50,13 +103,11 @@ def check_payload_size(file_result) -> None:
             "was retired in extraction/AD0007."
         )
 
-    size = file_result.value.size  # JS metadata, no read
+    size = int(file_result.value.size)  # JS metadata, no read
     if size == CHUNKED_EXPORT_SENTINEL_BYTES:
         raise ChunkedExportError(
             f"File is exactly {CHUNKED_EXPORT_SENTINEL_BYTES} bytes — "
             "likely a chunked export sentinel"
         )
     if size > MAX_FILE_SIZE_BYTES:
-        raise FileTooLargeError(
-            f"File is {size} bytes, exceeding limit of {MAX_FILE_SIZE_BYTES} bytes"
-        )
+        raise FileTooLargeError(size=size)

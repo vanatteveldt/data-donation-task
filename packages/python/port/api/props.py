@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import NotRequired, Optional, TypedDict, Union, Any
+from typing import Any, NotRequired, Optional, TypedDict, Union
 
 import pandas as pd
 
@@ -19,6 +19,8 @@ class Translations(TypedDict):
     en: str
     nl: str
     es: NotRequired[str]
+    lt: NotRequired[str]
+    ro: NotRequired[str]
 
 
 @dataclass
