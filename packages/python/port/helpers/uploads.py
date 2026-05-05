@@ -45,7 +45,7 @@ class FileTooLargeError(TranslatableException):
         if platform_name in {"Instagram", "Facebook"}:
             return {
                 "en": "In particular, make sure that date range is set to 'last year', format is set to 'json', and media quality is set to lower",
-                "nl": "heck in het bijzonder dat het datumbereik op 'Afgelopen jaar' staat, indeling op 'json', en mediakwaliteit op 'lager'",
+                "nl": "Check in het bijzonder dat het datumbereik op 'Afgelopen jaar' staat, indeling op 'json', en mediakwaliteit op 'lager'",
                 "es": "En particular, asegúrese de que el rango de fechas esté establecido en 'último año', el formato en 'json' y la calidad de los medios en 'más baja'",
                 "lt": "Visų pirma, įsitikinkite, kad datų intervalas nustatytas į 'praėjusius metus', formatas – į 'json', o medijos kokybė – į 'žemesnę'",
                 "ro": "În special, asigurați-vă că intervalul de date este setat la 'anul trecut', formatul la 'json', iar calitatea media la 'mai scăzută'",
@@ -61,7 +61,7 @@ class FileTooLargeError(TranslatableException):
         if platform_name in {"TikTok"}:
             return {
                 "en": "In particular, make sure that JSON is selected as the file format",
-                "nl": "heck in het bijzonder dat JSON is geselecteerd als bestandsindeling",
+                "nl": "Check in het bijzonder dat JSON is geselecteerd als bestandsindeling",
                 "es": "En particular, asegúrese de que JSON esté seleccionado como formato de archivo",
                 "lt": "Visų pirma, įsitikinkite, kad failo formatu pasirinktas JSON",
                 "ro": "În special, asigurați-vă că JSON este selectat ca format de fișier",
